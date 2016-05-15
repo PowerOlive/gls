@@ -10,8 +10,7 @@ func TestContexts(t *testing.T) {
 	mgr1 := NewContextManager()
 	mgr2 := NewContextManager()
 
-	CheckVal := func(mgr *ContextManager, key, exp_val string) {
-		val, ok := mgr.GetValue(key)
+	doCheckVal := func(key, exp_val string, val interface{}, ok bool) {
 		if len(exp_val) == 0 {
 			if ok {
 				t.Fatalf("expected no value for key %s, got %s", key, val)
@@ -26,7 +25,13 @@ func TestContexts(t *testing.T) {
 			t.Fatalf("expected value %s for key %s, got %s", exp_val, key,
 				val)
 		}
+	}
 
+	CheckVal := func(mgr *ContextManager, key, exp_val string) {
+		val, ok := mgr.GetValue(key)
+		doCheckVal(key, exp_val, val, ok)
+		valFromMap, ok := mgr.GetAll()[key]
+		doCheckVal(key, exp_val, valFromMap, ok)
 	}
 
 	Check := func(exp_m1v1, exp_m1v2, exp_m2v1, exp_m2v2 string) {

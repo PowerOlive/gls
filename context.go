@@ -109,6 +109,22 @@ func (m *ContextManager) GetValue(key interface{}) (value interface{}, ok bool) 
 	return "", false
 }
 
+// GetAll gets all values.
+func (m *ContextManager) GetAll() map[interface{}]interface{} {
+	tags := readStackTags(1)
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+	allValues := make(map[interface{}]interface{})
+	for _, tag := range tags {
+		if values, ok := m.values[tag]; ok {
+			for key, value := range values {
+				allValues[key] = value
+			}
+		}
+	}
+	return allValues
+}
+
 func (m *ContextManager) getValues() Values {
 	tags := readStackTags(2)
 	m.mtx.RLock()
